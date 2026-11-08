@@ -1,0 +1,123 @@
+name: device-shots
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  schedule: [ { cron: "0 3 * * *" } ]     # nightly false-failure tracking on main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  changes:                                 # always runs, so the required check never sits "pending"
+    runs-on: ubuntu-24.04
+    outputs: { ui: "${{ steps.f.outputs.ui }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - id: f
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            ui:
+              - '**/src/main/**'
+              - '**/src/debug/**'
+              - '**/src/androidTest/**'
+              - '**/build.gradle.kts'
+              - 'gradle/libs.versions.toml'
+              - 'build-logic/**'
+              - 'screenshot-kit/**'
+              - 'preview-kit/**'
+              - 'tooling/**'
+              - '.github/workflows/device-shots.yml'
+
+  jvm:                                     # unit tests + preview screenshots
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew testDebugUnitTest && ./screenshots previews <module>   # repeat per module
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: preview-report, path: build/reports/screenshots/ }
+
+  verify:                                  # Lane B
+    needs: changes
+    if: needs.changes.outputs.ui == 'true' || github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix: { shard: [0, 1] }            # one emulator per job: Dropshots' adb calls don't pick a device
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: actions/cache@v4
+        with: { path: .cache/emu, key: "emu-${{ hashFiles('tooling/emulator/emulator.lock') }}" }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Boot pinned emulator (one retry, infrastructure only)
+        run: tooling/emulator/boot.sh || { [ $? -eq 75 ] && tooling/emulator/boot.sh; }
+      - name: Verify
+        env: { CI: "true" }
+        run: |
+          ./screenshots shots <module> \
+            -Pandroid.testInstrumentationRunnerArguments.numShards=2 \
+            -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shots-${{ matrix.shard }}
+          path: |
+            build/reports/screenshots/
+            **/build/test-results/dropshots/
+            build/emulator.log
+            build/logcat.txt
+
+  gate:                                    # make THIS the required check
+    needs: [changes, jvm, verify]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          [[ "${{ needs.jvm.result }}" == "success" ]]
+          [[ "${{ needs.verify.result }}" =~ ^(success|skipped)$ ]]
+
+  record:
+    if: github.event.action == 'labeled' && github.event.label.name == 'record-shots'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - id: app                            # App token, so the pushed commit re-triggers CI
+        uses: actions/create-github-app-token@v1
+        with: { app-id: "${{ vars.SHOTS_APP_ID }}", private-key: "${{ secrets.SHOTS_APP_KEY }}" }
+      - uses: actions/checkout@v4
+        with: { ref: "${{ github.head_ref }}", token: "${{ steps.app.outputs.token }}", lfs: true }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: actions/cache@v4
+        with: { path: .cache/emu, key: "emu-${{ hashFiles('tooling/emulator/emulator.lock') }}" }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: gradle/actions/setup-gradle@v4
+      - run: tooling/emulator/boot.sh || { [ $? -eq 75 ] && tooling/emulator/boot.sh; }
+      - run: ./screenshots shots-record <module>
+        env: { CI: "true" }
+      - name: Push goldens to the PR branch
+        run: |
+          git config user.name "shots-bot"
+          git config user.email "shots-bot@users.noreply.github.com"
+          git add -A -- ':(glob)**/src/androidTest/screenshots/**'
+          git commit -m "Re-record device screenshots" || exit 0
+          git push

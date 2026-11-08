@@ -1,0 +1,6 @@
+package __PACKAGE__
+
+/** Named UI states shared by previews and emulator tests. No network, no real clock. */
+object __BASE__Fixtures {
+    val loaded: Nothing get() = TODO("Return the loaded UI state for __BASE__")
+}

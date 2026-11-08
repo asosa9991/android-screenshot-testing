@@ -1,0 +1,19 @@
+package __PACKAGE__
+
+import com.example.testing.DeviceScreenshot
+import com.example.testing.DeviceShotRule
+import org.junit.Rule
+import org.junit.Test
+
+@DeviceScreenshot(reason = "TODO: name the system-UI dependency, e.g. status-bar contrast over an edge-to-edge header")
+class __BASE__DeviceShots {
+    @get:Rule val shots = DeviceShotRule()
+
+    @Test fun loaded_light() = shots.capture("loaded_light", group = "__GROUP__") {
+        AppTheme { __SCREEN__(__BASE__Fixtures.loaded) }
+    }
+
+    @Test fun loaded_dark() = shots.capture("loaded_dark", group = "__GROUP__", night = true) {
+        AppTheme { __SCREEN__(__BASE__Fixtures.loaded) }
+    }
+}

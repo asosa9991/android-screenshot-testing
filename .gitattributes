@@ -1,0 +1,5 @@
+# Screenshot goldens should live in Git LFS once the team adopts this setup.
+# Commented out in the POC because Git LFS isn't installed on the machine that pushed it;
+# with `git lfs install` done, uncomment these and run `git lfs migrate import --include="*.png"`.
+# **/src/androidTest/screenshots/**/*.png filter=lfs diff=lfs merge=lfs -text
+# **/src/test/screenshots/**/*.png filter=lfs diff=lfs merge=lfs -text

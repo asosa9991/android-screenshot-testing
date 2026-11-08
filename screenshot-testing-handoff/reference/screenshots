@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# The one command for screenshot tests. Run ./screenshots with no arguments for help.
+# <module> is a Gradle path, with or without the leading colon: feature:home or :feature:home
+set -euo pipefail
+cd "$(dirname "$0")"
+source tooling/env.sh
+
+cmd=${1:-help}; [[ $# -gt 0 ]] && shift
+module=${1:-}; module=${module#:}; dir=${module//://}
+need_module() { [[ -n "$module" && -d "$dir" ]] || { echo "Usage: ./screenshots $cmd <module>   (e.g. feature:home)"; exit 2; }; }
+[[ $# -gt 0 ]] && shift
+
+case "$cmd" in
+  previews)
+    need_module
+    rm -rf "$dir/build/test-results/roborazzi" "$dir/build/outputs/roborazzi"   # no stale results in the report
+    if ./gradlew ":$module:verifyRoborazziDebug" "$@"; then status=0; else status=1; fi
+    tooling/screenshots/report.sh verify-previews "$dir"
+    if [[ $status == 0 ]]; then echo "Preview screenshots match the goldens."
+    else echo "Preview screenshot mismatch: see the report. If intended: ./screenshots previews-record $module"; exit 1; fi ;;
+
+  previews-record)
+    need_module
+    goldens="$dir/src/test/screenshots"; backup=$(mktemp -d)
+    [[ -d "$goldens" ]] && cp -R "$goldens/." "$backup/"
+    find "$goldens" -name '*.png' -delete 2>/dev/null || true      # drop goldens of removed previews
+    if ! ./gradlew ":$module:recordRoborazziDebug" "$@"; then
+      rm -rf "$goldens" && mkdir -p "$goldens" && cp -R "$backup/." "$goldens/"
+      echo "Recording aborted: a preview failed to render. Goldens are unchanged."; exit 1
+    fi
+    tooling/screenshots/report.sh record-previews "$dir" "$backup" ;;
+
+  shots)        need_module; tooling/screenshots/shots.sh verify "$module" "$@" ;;
+  shots-record) need_module; tooling/screenshots/shots.sh record "$module" "$@" ;;
+  shots-new)    need_module; tooling/screenshots/shots.sh new "$module" "${1:?usage: ./screenshots shots-new <module> <ScreenName>}" ;;
+  flake)        need_module; tooling/screenshots/flake-check.sh "$module" "${1:-5}" ;;
+  goldens)      p=$(tooling/screenshots/gallery.sh); open "$p" 2>/dev/null || echo "Open $p" ;;
+
+  *)
+    cat <<'HELP'
+Usage: ./screenshots <command> <module>
+
+  Preview screenshots (JVM, seconds)
+    previews <module>               Compare every @Preview with its golden
+    previews-record <module>        Re-record preview goldens after an intended change
+
+  Emulator screenshots (real status and navigation bars)
+    shots <module>                  Compare with goldens
+    shots-record <module>           Re-record (CI records via the 'record-shots' PR label)
+    shots-new <module> <Screen>     Scaffold an emulator screenshot test
+    flake <module> [N]              Cold-boot the emulator N times and compare (stability check)
+
+  Other
+    goldens                         Open a gallery of every golden image
+
+Every compare and record writes an HTML report to build/reports/screenshots/ and opens it.
+HELP
+    [[ "$cmd" == help ]] || exit 2 ;;
+esac

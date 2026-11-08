@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# The one command for this project. Run ./run with no arguments for help.
+set -euo pipefail
+cd "$(dirname "$0")"
+source tooling/env.sh
+
+MODULE=${MODULE:-feature:chat}   # override: MODULE=feature:other ./run shots
+cmd=${1:-help}; [[ $# -gt 0 ]] && shift
+
+backend_up() { curl -s --max-time 2 localhost:8080/health >/dev/null 2>&1; }
+
+case "$cmd" in
+  backend)
+    echo "Mock backend: http://localhost:8080 (the emulator reaches it at http://10.0.2.2:8080). Ctrl+C to stop."
+    exec ./gradlew :mock-backend:run --console=plain -q ;;
+
+  app)
+    backend_up || echo "Note: the mock backend isn't running. Start it in another terminal: ./run backend"
+    tooling/emulator/boot.sh --window --reuse
+    ./gradlew :app:installDebug -q
+    adb shell am start -n com.example.app/.MainActivity >/dev/null
+    echo "App launched in the emulator window." ;;
+
+  test)
+    ./gradlew :feature:chat:testDebugUnitTest :mock-backend:test
+    echo "Unit tests passed. Reports: feature/chat/build/reports/tests/, mock-backend/build/reports/tests/" ;;
+
+  ui-test)
+    backend_up || echo "Note: the backend contract test is skipped unless ./run backend is running."
+    tooling/emulator/boot.sh --reuse --any
+    ./gradlew ":$MODULE:connectedDebugAndroidTest" \
+      -Pandroid.testInstrumentationRunnerArguments.notAnnotation=com.example.testing.DeviceScreenshot "$@"
+    echo "UI tests passed." ;;
+
+  previews)
+    dir=${MODULE//://}
+    rm -rf "$dir/build/test-results/roborazzi" "$dir/build/outputs/roborazzi"   # no stale results in the report
+    if ./gradlew ":$MODULE:verifyRoborazziDebug" "$@"; then status=0; else status=1; fi
+    tooling/screenshots/report.sh verify-previews "$dir"
+    if [[ $status == 0 ]]; then
+      echo "Preview screenshots match the goldens in $dir/src/test/screenshots/."
+    else
+      echo "Preview screenshot mismatch: see the report. If the change is intended: ./run previews-record"
+      exit 1
+    fi ;;
+  previews-record)
+    goldens="${MODULE//://}/src/test/screenshots"
+    backup=$(mktemp -d)
+    [[ -d "$goldens" ]] && cp -R "$goldens/." "$backup/"
+    # Delete first so goldens for removed or renamed previews disappear.
+    find "$goldens" -name '*.png' -delete 2>/dev/null || true
+    if ! ./gradlew ":$MODULE:recordRoborazziDebug" "$@"; then
+      rm -rf "$goldens" && mkdir -p "$goldens" && cp -R "$backup/." "$goldens/"
+      echo "Recording aborted: a preview failed to render. Goldens are unchanged."
+      exit 1
+    fi
+    echo "Recorded $(find "$goldens" -name '*.png' | wc -l | tr -d ' ') preview goldens in $goldens/."
+    tooling/screenshots/report.sh record-previews "${MODULE//://}" "$backup" ;;
+
+  shots)        tooling/screenshots/shots.sh verify "$MODULE" "$@" ;;
+  shots-record) tooling/screenshots/shots.sh record "$MODULE" "$@" ;;
+  shots-new)    tooling/screenshots/shots.sh new "$MODULE" "${1:?usage: ./run shots-new <ScreenName>}" ;;
+  shots-flake)  tooling/screenshots/flake-check.sh "$MODULE" "${1:-5}" ;;
+
+  goldens)
+    open "$(tooling/screenshots/gallery.sh)" 2>/dev/null || echo "Open $(tooling/screenshots/gallery.sh) in a browser." ;;
+
+  stop)
+    adb emu kill >/dev/null 2>&1 && echo "Emulator stopped." || echo "No emulator running."
+    rm -f .cache/emulator-mode
+    pids=$(lsof -ti tcp:8080 -sTCP:LISTEN 2>/dev/null || true)
+    [[ -n "$pids" ]] && kill $pids && echo "Backend stopped." || echo "No backend running." ;;
+
+  *)
+    cat <<'HELP'
+Usage: ./run <command>
+
+  Use the app
+    backend          Start the mock backend (leave it running in its own terminal)
+    app              Open the emulator window and launch the app
+
+  Test (no emulator)
+    test             Unit tests
+    previews         Preview screenshots: every @Preview, compared with its golden (seconds)
+    previews-record  Re-record the preview goldens after an intended UI change
+
+  Test (emulator)
+    ui-test          Behavior tests (buttons, chips, backend contract)
+    shots            Screenshots with the real status and navigation bars
+    shots-record     Re-record the goldens after an intended UI change
+    shots-new <Name> Create a screenshot test for a screen, e.g. ./run shots-new ProfileScreen
+    shots-flake [N]  Stability check: cold-boot the emulator N times (default 5) and compare
+
+  Other
+    goldens          Open a gallery of every golden image in your browser
+    stop             Stop the emulator and the backend
+
+Commands use feature:chat; set MODULE=feature:x to target another module.
+HELP
+    [[ "$cmd" == help ]] || exit 2 ;;
+esac

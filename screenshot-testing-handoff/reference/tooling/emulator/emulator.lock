@@ -1,0 +1,9 @@
+# Pinned emulator for Lane B (CI, Linux x86_64). Change only through an upgrade PR:
+# see docs/testing.md, "Upgrading the emulator". Fill in with tooling/emulator/print-lock.sh.
+API=36
+EMULATOR_URL=https://dl.google.com/android/repository/emulator-linux_x64-REPLACE_BUILD_ID.zip
+EMULATOR_SHA256=REPLACE
+EMULATOR_VERSION="REPLACE"
+SYSIMG_URL=https://dl.google.com/android/repository/sys-img/android/x86_64-36_rREPLACE.zip
+SYSIMG_SHA256=REPLACE
+EXPECTED_FINGERPRINT=REPLACE

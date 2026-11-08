@@ -1,0 +1,1193 @@
+<title>Pixel-Stable Emulator Screenshots</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky contents rail + one reading column; tables and code may run wider inside their own scroll boxes. */
+:root {
+  --bg: #f4f7f5;
+  --surface: #ffffff;
+  --ink: #13201a;
+  --muted: #56675f;
+  --line: #d6e0db;
+  --accent: #0d7650;
+  --accent-soft: #e2f1ea;
+  --diff: #c81d74;
+  --warn: #9a5b00;
+  --code-bg: #101814;
+  --code-ink: #dfe9e4;
+  --code-dim: #7f978b;
+  --code-key: #7ee0b5;
+  --phone: #e8eeeb;
+  --phone-ui: #c3d1ca;
+
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Instrument Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --s-1: .8125rem; --s0: 1rem; --s1: 1.1875rem; --s2: 1.5rem; --s3: 2.125rem; --s4: clamp(2.25rem, 5vw, 3.5rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1210; --surface: #131b18; --ink: #e2ebe6; --muted: #93a49c; --line: #25322d;
+    --accent: #42cf97; --accent-soft: #15302a; --diff: #ff62ab; --warn: #f0b048;
+    --code-bg: #080c0a; --code-ink: #dfe9e4; --code-dim: #6f877b; --code-key: #7ee0b5;
+    --phone: #1c2622; --phone-ui: #33433c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1210; --surface: #131b18; --ink: #e2ebe6; --muted: #93a49c; --line: #25322d;
+  --accent: #42cf97; --accent-soft: #15302a; --diff: #ff62ab; --warn: #f0b048;
+  --code-bg: #080c0a; --code-ink: #dfe9e4; --code-dim: #6f877b; --code-key: #7ee0b5;
+  --phone: #1c2622; --phone-ui: #33433c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: var(--s0); line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.shell {
+  max-width: 1140px; margin: 0 auto; padding-block: 40px 96px;
+  display: grid; grid-template-columns: 1fr; gap: 48px;
+}
+@media (min-width: 1020px) { .shell { grid-template-columns: 200px minmax(0, 1fr); } }
+
+nav.toc { display: none; }
+@media (min-width: 1020px) {
+  nav.toc { display: block; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 32px); align-self: start; font-size: var(--s-1); }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: t; }
+  nav.toc li { counter-increment: t; }
+  nav.toc a { color: var(--muted); text-decoration: none; display: flex; gap: 10px; }
+  nav.toc a::before { content: counter(t, decimal-leading-zero); font-family: var(--f-mono); color: var(--line); }
+  nav.toc a:hover { color: var(--accent); }
+  nav.toc .toc-h { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+}
+
+main { min-width: 0; display: grid; gap: 72px; }
+section { display: grid; gap: 20px; min-width: 0; scroll-margin-top: 24px; }
+.prose { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.12; font-weight: 700; }
+h1 { font-size: var(--s4); letter-spacing: -.02em; }
+h2 { font-size: var(--s3); letter-spacing: -.01em; }
+h3 { font-size: var(--s1); font-weight: 500; }
+p { margin: 0; }
+.stack { display: grid; gap: 14px; }
+.eyebrow { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: var(--s1); color: var(--muted); max-width: 62ch; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--accent-soft); padding: .08em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+strong { font-weight: 600; }
+.muted { color: var(--muted); }
+.small { font-size: var(--s-1); }
+
+/* Hero */
+.meta-row { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--f-mono); font-size: .75rem; color: var(--muted); letter-spacing: .04em; }
+.hero { display: grid; gap: 28px; }
+.hero h1 em { font-style: normal; color: var(--diff); }
+.triptych { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 560px; }
+.triptych figure { margin: 0; display: grid; gap: 6px; }
+.triptych svg { width: 100%; height: auto; display: block; }
+.triptych figcaption { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.ph-frame { fill: var(--phone); stroke: var(--line); stroke-width: 2; }
+.ph-ui { fill: var(--phone-ui); }
+.ph-accent { fill: var(--accent); }
+.ph-text { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+.ph-diff { fill: var(--diff); }
+.ph-ghost { fill: var(--phone-ui); opacity: .35; }
+.cap { font-size: var(--s-1); color: var(--muted); max-width: 60ch; }
+
+.ask {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 10px;
+  padding: 22px 24px; display: grid; gap: 10px; max-width: 780px;
+}
+.ask ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+
+/* Tables */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; min-width: 640px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+tr.rec td { background: var(--accent-soft); }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: .86rem; white-space: nowrap; }
+.pill { display: inline-block; font-family: var(--f-mono); font-size: .7rem; padding: 2px 8px; border-radius: 999px; white-space: nowrap; border: 1px solid currentColor; }
+.pill.hi { color: var(--diff); }
+.pill.md { color: var(--warn); }
+.pill.lo { color: var(--muted); }
+.pill.ok { color: var(--accent); }
+
+/* Skill callouts */
+.quote { border-left: 3px solid var(--accent); padding: 4px 0 4px 18px; max-width: 68ch; font-size: 1.02rem; }
+.quote cite { display: block; font-style: normal; font-family: var(--f-mono); font-size: .72rem; color: var(--muted); margin-top: 6px; }
+.two { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start; }
+@media (min-width: 820px) { .two { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+.two > * { min-width: 0; }
+.matrix svg { width: 100%; max-width: 420px; height: auto; display: block; }
+.mx-box { fill: var(--surface); stroke: var(--muted); stroke-width: 1.2; }
+.mx-hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.mx-lbl { fill: var(--muted); font-family: var(--f-mono); font-size: 10px; }
+.mx-lbl-a { fill: var(--accent); font-family: var(--f-mono); font-size: 10px; font-weight: 600; }
+
+/* Calculator */
+.calc { display: grid; gap: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 20px; }
+.calc-in { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px 16px; }
+.calc-in label { display: grid; gap: 4px; font-size: var(--s-1); color: var(--muted); }
+.calc-in input {
+  font-family: var(--f-mono); font-size: .9rem; padding: 7px 9px; width: 100%;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink);
+}
+.calc .tbl-wrap { border-radius: 8px; }
+
+/* Lanes */
+.lanes { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 760px) { .lanes { grid-template-columns: 1fr 1fr; } }
+.lane { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.lane.b { border-color: var(--accent); }
+.lane-tag { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.lane.b .lane-tag { color: var(--accent); }
+.lane dl { margin: 0; display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 6px 12px; font-size: .92rem; }
+.lane dt { color: var(--muted); }
+.lane dd { margin: 0; min-width: 0; }
+
+/* Contract layers */
+.layers { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.layer { display: grid; grid-template-columns: 1fr; gap: 10px 28px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+.layer:last-child { border-bottom: 0; }
+@media (min-width: 760px) { .layer { grid-template-columns: 180px minmax(0, 1fr); } }
+.layer h3 { font-size: 1.05rem; }
+.layer .why { font-size: var(--s-1); color: var(--muted); margin-top: 4px; }
+.layer ul { margin: 0; padding-left: 1.1em; display: grid; gap: 5px; font-size: .94rem; min-width: 0; }
+
+/* Adoption */
+.dx { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 900px) { .dx { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.dx > * { min-width: 0; }
+.kit { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.kit div { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr); gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--line); font-size: .92rem; }
+.kit div:last-child { border-bottom: 0; }
+.kit dt, .kit b { font-family: var(--f-mono); font-size: .8rem; font-weight: 600; color: var(--accent); overflow-wrap: anywhere; }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 72ch; }
+.checklist li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: .94rem; }
+.checklist li::before { content: ""; width: 14px; height: 14px; margin-top: 5px; border: 2px solid var(--accent); border-radius: 3px; }
+
+/* Code tabs */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button {
+  font-family: var(--f-mono); font-size: .78rem; padding: 7px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+}
+.tabs button[aria-selected="true"] { background: var(--code-bg); color: var(--code-key); border-color: var(--code-bg); }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"]:hover { color: var(--code-key); }
+.panel { display: grid; gap: 8px; min-width: 0; }
+.panel .note { font-size: var(--s-1); color: var(--muted); max-width: 72ch; }
+pre {
+  margin: 0; background: var(--code-bg); color: var(--code-ink); border-radius: 10px;
+  padding: 18px 20px; overflow-x: auto; font-family: var(--f-mono); font-size: .8rem; line-height: 1.55; tab-size: 2;
+}
+pre .c { color: var(--code-dim); }
+pre .k { color: var(--code-key); }
+
+/* Sequences */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s; max-width: 820px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; padding-block: 12px; border-bottom: 1px dashed var(--line); }
+.steps li:last-child { border-bottom: 0; }
+.steps li::before { content: counter(s); font-family: var(--f-display); font-weight: 700; font-size: 1.4rem; color: var(--accent); line-height: 1.2; }
+.phases { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 760px) { .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .phases { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.phase { border-top: 3px solid var(--accent); background: var(--surface); padding: 16px 18px 18px; border-radius: 0 0 8px 8px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.phase .when { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); letter-spacing: .06em; }
+.phase ul { margin: 0; padding-left: 1.1em; font-size: .92rem; display: grid; gap: 4px; }
+.phase .exit { font-size: var(--s-1); color: var(--accent); }
+
+.decisions { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-width: 820px; }
+.decisions li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; }
+.decisions li::before { content: ""; width: 16px; height: 16px; margin-top: 4px; border: 2px solid var(--accent); border-radius: 4px; }
+
+.sources { font-size: var(--s-1); color: var(--muted); display: grid; gap: 6px; padding-left: 1.1em; margin: 0; }
+.sources a { overflow-wrap: anywhere; }
+footer { font-size: var(--s-1); color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ph-diff { animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+}
+</style>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <div class="toc-h">Contents</div>
+    <ol>
+      <li><a href="#problem">Why device shots flake</a></li>
+      <li><a href="#skill">What Google prescribes</a></li>
+      <li><a href="#options">Options and cost</a></li>
+      <li><a href="#proposal">The proposal</a></li>
+      <li><a href="#contract">Determinism contract</a></li>
+      <li><a href="#adopt">Adding a test</a></li>
+      <li><a href="#code">Reference implementation</a></li>
+      <li><a href="#goldens">Golden lifecycle</a></li>
+      <li><a href="#runbook">Running the emulator</a></li>
+      <li><a href="#rollout">Rollout</a></li>
+      <li><a href="#metrics">Success measures</a></li>
+      <li><a href="#risks">Risks</a></li>
+      <li><a href="#decide">Decisions needed</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="meta-row"><span>Proposal · revision 2</span><span>Android UI quality</span><span>November 2026</span></div>
+      <div class="stack">
+        <h1>Emulator screenshots that fail only when the <em>UI</em> changed</h1>
+        <p class="lede">This plan makes instrumented screenshot tests on an emulator stable enough to be a required PR check. It's also simple enough that any developer can add one in about 15 minutes. The core is one pinned, CPU-rendered emulator with a written determinism contract. A JVM lane takes the screenshots that don't need a device, so the emulator lane stays fast and cheap.</p>
+      </div>
+      <div class="triptych" role="img" aria-label="Illustration: reference, actual and diff screenshots where the only difference is the status bar clock.">
+        <figure>
+          <svg viewBox="0 0 120 220" aria-hidden="true">
+            <rect class="ph-frame" x="2" y="2" width="116" height="216" rx="14"/>
+            <text class="ph-text" x="12" y="20">12:00</text>
+            <rect class="ph-ui" x="86" y="12" width="22" height="8" rx="2"/>
+            <rect class="ph-ui" x="12" y="36" width="96" height="44" rx="6"/>
+            <rect class="ph-ui" x="12" y="88" width="70" height="8" rx="2"/>
+            <rect class="ph-ui" x="12" y="102" width="88" height="8" rx="2"/>
+            <rect class="ph-ui" x="12" y="116" width="54" height="8" rx="2"/>
+            <rect class="ph-accent" x="12" y="182" width="96" height="22" rx="11"/>
+          </svg>
+          <figcaption>Reference</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 120 220" aria-hidden="true">
+            <rect class="ph-frame" x="2" y="2" width="116" height="216" rx="14"/>
+            <text class="ph-text" x="12" y="20">12:01</text>
+            <rect class="ph-ui" x="86" y="12" width="22" height="8" rx="2"/>
+            <rect class="ph-ui" x="12" y="36" width="96" height="44" rx="6"/>
+            <rect class="ph-ui" x="12" y="88" width="70" height="8" rx="2"/>
+            <rect class="ph-ui" x="12" y="102" width="88" height="8" rx="2"/>
+            <rect class="ph-ui" x="12" y="116" width="54" height="8" rx="2"/>
+            <rect class="ph-accent" x="12" y="182" width="96" height="22" rx="11"/>
+          </svg>
+          <figcaption>Actual</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 120 220" aria-hidden="true">
+            <rect class="ph-frame" x="2" y="2" width="116" height="216" rx="14"/>
+            <rect class="ph-ghost" x="86" y="12" width="22" height="8" rx="2"/>
+            <rect class="ph-ghost" x="12" y="36" width="96" height="44" rx="6"/>
+            <rect class="ph-ghost" x="12" y="88" width="70" height="8" rx="2"/>
+            <rect class="ph-ghost" x="12" y="102" width="88" height="8" rx="2"/>
+            <rect class="ph-ghost" x="12" y="116" width="54" height="8" rx="2"/>
+            <rect class="ph-ghost" x="12" y="182" width="96" height="22" rx="11"/>
+            <rect class="ph-diff" x="34" y="11" width="9" height="11" rx="1"/>
+          </svg>
+          <figcaption>Diff</figcaption>
+        </figure>
+      </div>
+      <p class="cap">Illustration of a typical false failure. Nothing in the app changed, but the status bar clock moved on by a minute. System UI demo mode removes this whole class of failure, and the rest of this plan handles the other sources of flakiness the same way.</p>
+
+      <div class="ask">
+        <span class="eyebrow">The ask</span>
+        <ul>
+          <li><strong>Make emulator screenshot tests a required PR check</strong>, built on Google's <code>testing-setup</code> Android skill (updated 28 Oct 2026) and Dropshots 0.6.0.</li>
+          <li><strong>Choose option B (two lanes)</strong> from the costed comparison below. Option A uses the same emulator design and only changes the shard count, so it stays available.</li>
+          <li><strong>Ship a developer kit</strong> so adding a test means one Gradle plugin line, one rule and <code>./shots new</code>.</li>
+          <li><strong>Fund 7 weeks</strong> for 1 engineer, plus part-time design-system review. Week 1 is a measurement spike that decides go or no-go.</li>
+        </ul>
+      </div>
+    </header>
+
+    <section id="problem">
+      <span class="eyebrow">01 · Analysis</span>
+      <h2>Why device screenshot tests flake</h2>
+      <p class="prose">An instrumented screenshot is the product of the app plus everything around it: the emulator binary, system image, GPU path, system UI, clock, locale, navigation mode and timing. Teams usually give up on device screenshots because one of these changed and nobody could tell which. Every source below can be controlled, and this plan controls all of them in code.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Source of variance</th><th>What you see in the diff</th><th>Impact</th><th>Control in this plan</th></tr></thead>
+          <tbody>
+            <tr><td>Host GPU rendering</td><td>Anti-aliasing and gradient banding differ between machines</td><td><span class="pill hi">High</span></td><td>CPU rendering with <code>swiftshader_indirect</code>, for both record and verify</td></tr>
+            <tr><td>Emulator and image drift</td><td>Hundreds of scattered pixels after the CI runner updates its SDK</td><td><span class="pill hi">High</span></td><td>Download a pinned emulator build and system image, verified by sha256. The lock file covers the emulator version, image revision and build fingerprint, and <code>config.ini</code> is checked into git</td></tr>
+            <tr><td>CPU architecture</td><td>Apple Silicon (arm64) and CI (x86_64) render text slightly differently</td><td><span class="pill hi">High</span></td><td>Goldens are recorded only on CI. Local runs are labelled advisory</td></tr>
+            <tr><td>System UI</td><td>Clock, battery, signal and notification icons change</td><td><span class="pill hi">High</span></td><td>Demo mode set per test, then a short wait for it to settle</td></tr>
+            <tr><td>Night mode applied in the wrong place</td><td>Dark app content under light-mode system bar icons</td><td><span class="pill hi">High</span></td><td>Set <code>cmd uimode night</code> before the activity launches, so <code>enableEdgeToEdge()</code> picks the right bar style</td></tr>
+            <tr><td>Frame not settled</td><td>Insets or demo-mode icons only half applied</td><td><span class="pill hi">High</span></td><td>Capture until two frames in a row are identical. A screen that never settles is reported as an infrastructure failure</td></tr>
+            <tr><td>Animations and timing</td><td>Ripples, shimmer and transitions captured mid-frame</td><td><span class="pill hi">High</span></td><td>All animation scales set to 0, Compose <code>mainClock</code> paused</td></tr>
+            <tr><td>Navigation mode, display cutout</td><td>Bottom inset changes height</td><td><span class="pill md">Medium</span></td><td>3-button navigation overlay pinned; the cutout is fixed by <code>config.ini</code></td></tr>
+            <tr><td>Error dialogs and keyguard</td><td>A "System UI isn't responding" dialog or the lock screen ends up in the golden</td><td><span class="pill md">Medium</span></td><td><code>hide_error_dialogs</code>, screen kept on, keyguard dismissed, an ANR check before tests start, and <code>recordOnFailure = false</code></td></tr>
+            <tr><td>Soft keyboard</td><td>The IME covers half the screen</td><td><span class="pill md">Medium</span></td><td><code>hw.keyboard=yes</code> in <code>config.ini</code> plus <code>show_ime_with_hard_keyboard 0</code></td></tr>
+            <tr><td>Async content, wall clock</td><td>Late images, "5 min ago" timestamps, dates</td><td><span class="pill md">Medium</span></td><td>Hilt fakes, shared fixtures, a fixed <code>Clock</code>, UTC, en-US</td></tr>
+            <tr><td>Wrong API level</td><td>The app doesn't actually run edge-to-edge</td><td><span class="pill md">Medium</span></td><td>Pin API 35 or 36 to match <code>targetSdk</code>. Edge-to-edge is enforced from API 35 for apps targeting 35+</td></tr>
+            <tr><td>ATD images</td><td>Blank or wrong screenshots</td><td><span class="pill lo">Trap</span></td><td>Don't use <code>-atd</code> images. Google says screenshot tests that need hardware rendering aren't supported on them</td></tr>
+            <tr><td>Retries</td><td>Flakes hidden until they pile up</td><td><span class="pill lo">Trap</span></td><td>Never retry a pixel mismatch. Retry only boot failures, once</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="skill">
+      <span class="eyebrow">02 · Source of record</span>
+      <h2>What Google's testing-setup skill prescribes</h2>
+      <p class="prose">The <a href="https://github.com/android/skills/blob/main/testing/testing-setup/SKILL.md">android/skills <code>testing-setup</code></a> skill is Google's testing playbook for coding agents. It was last updated on 28 October 2026, and the official screenshot testing docs link to it. It names Dropshots for instrumented screenshots and tells you when a device is required. It doesn't cover emulator determinism, so the contract in section 05 is this team's own design, built on top of it.</p>
+      <div class="two">
+        <div class="stack">
+          <p class="quote">"If instrumented screenshot tests are requested, install Dropshots."<cite>testing-setup · Step 3</cite></p>
+          <p class="quote">"You need a device for screenshot tests when verifying interaction with the system UI (examples: edge-to-edge rendering, notifications, picture-in-picture)"<cite>testing-setup · Step 12</cite></p>
+          <p class="quote">"Install the <code>com.dropbox.dropshots</code> plugin in the module and a <code>Dropshots()</code> JUnit Rule."<cite>testing-setup · Step 13</cite></p>
+          <p class="prose small muted">This plan also follows these skill rules:</p>
+          <ul class="prose small muted">
+            <li>Keep the existing test stack.</li>
+            <li>Don't upgrade AGP as part of screenshot setup; make it a separate decision.</li>
+            <li>Never combine the legacy screenshot plugin and AGP test suites in one module.</li>
+            <li>Use DI fakes for loading, error and offline states.</li>
+            <li>Use <code>DeviceConfigurationOverride</code> to simulate window sizes and font scales (Step 11).</li>
+            <li>Keep end-to-end tests to about 5% of all tests.</li>
+            <li>Ask before documenting the testing strategy. Update <code>AGENTS.md</code> if it exists; otherwise write <code>docs/testing.md</code> and link it from a new <code>AGENTS.md</code>.</li>
+          </ul>
+        </div>
+        <figure class="matrix stack" style="margin:0">
+          <svg viewBox="0 0 380 330" role="img" aria-label="Nine screen sizes drawn to scale: widths 400, 610 and 900 dp by heights 400, 500 and 1000 dp. The 400 by 500 size is highlighted.">
+            <text class="mx-lbl" x="62" y="22">400</text>
+            <text class="mx-lbl" x="138" y="22">610</text>
+            <text class="mx-lbl" x="240" y="22">900 dp</text>
+            <text class="mx-lbl" x="8" y="64">400</text>
+            <text class="mx-lbl" x="8" y="136">500</text>
+            <text class="mx-lbl" x="8" y="250">1000</text>
+            <rect class="mx-box" x="62" y="34" width="48" height="48" rx="3"/>
+            <rect class="mx-box" x="138" y="34" width="73.2" height="48" rx="3"/>
+            <rect class="mx-box" x="240" y="34" width="108" height="48" rx="3"/>
+            <rect class="mx-hot" x="62" y="104" width="48" height="60" rx="3"/>
+            <rect class="mx-box" x="138" y="104" width="73.2" height="60" rx="3"/>
+            <rect class="mx-box" x="240" y="104" width="108" height="60" rx="3"/>
+            <rect class="mx-box" x="62" y="186" width="48" height="120" rx="3"/>
+            <rect class="mx-box" x="138" y="186" width="73.2" height="120" rx="3"/>
+            <rect class="mx-box" x="240" y="186" width="108" height="120" rx="3"/>
+            <text class="mx-lbl-a" x="62" y="324">400×500: themes + font scale 1.5</text>
+          </svg>
+          <figcaption class="cap">The skill's screen matrix (Step 8), drawn to scale. In this plan it's a single annotation, <code>@ScreenMatrix</code>, in the JVM lane. On an emulator, all nine sizes would mean nine captures per screen.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="options">
+      <span class="eyebrow">03 · Options</span>
+      <h2>Three ways to run screenshot tests on an emulator, costed</h2>
+      <p class="prose">All three options use the same determinism contract and developer kit. They differ in how many screenshots go through an emulator and whose hardware runs it. Every default below is an <strong>assumption to be replaced by week-1 measurements</strong>. Edit any value and the table recalculates.</p>
+      <div class="calc">
+        <div class="calc-in">
+          <label for="c-total">Total screenshots<input id="c-total" type="number" min="1" value="600"></label>
+          <label for="c-share">Option B: share that needs a device (%)<input id="c-share" type="number" min="1" max="100" value="12"></label>
+          <label for="c-sdev">Seconds per emulator capture<input id="c-sdev" type="number" min="0.1" step="0.1" value="4"></label>
+          <label for="c-sjvm">Seconds per JVM capture<input id="c-sjvm" type="number" min="0.05" step="0.05" value="0.4"></label>
+          <label for="c-build">Build minutes per CI job<input id="c-build" type="number" min="0" step="0.5" value="6"></label>
+          <label for="c-boot">Cold boot minutes<input id="c-boot" type="number" min="0" step="0.5" value="2.5"></label>
+          <label for="c-sha">Emulator shards, option A<input id="c-sha" type="number" min="1" value="4"></label>
+          <label for="c-shb">Emulator shards, option B<input id="c-shb" type="number" min="1" value="2"></label>
+          <label for="c-runs">PR runs per working day<input id="c-runs" type="number" min="0" value="40"></label>
+          <label for="c-price">Runner $ per minute<input id="c-price" type="number" min="0" step="0.001" value="0.016"></label>
+          <label for="c-farm">Device farm $ per device-minute<input id="c-farm" type="number" min="0" step="0.001" value="0.017"></label>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Option</th><th>Wall time / run</th><th>CI minutes / run</th><th>$ / month</th><th>System UI coverage</th><th>Who maintains the emulator</th></tr></thead>
+            <tbody>
+              <tr><td>A · Every screenshot on the pinned emulator, sharded</td><td class="num" id="o-a-wall">–</td><td class="num" id="o-a-min">–</td><td class="num" id="o-a-cost">–</td><td>All shots, at full fidelity</td><td>Us. The highest load, with the most captures exposed to flakiness</td></tr>
+              <tr class="rec"><td>B · Two lanes (recommended): device shots on the emulator, the rest on JVM</td><td class="num" id="o-b-wall">–</td><td class="num" id="o-b-min">–</td><td class="num" id="o-b-cost">–</td><td>Every screen that depends on system UI</td><td>Us, at a small scale. The JVM lane adds an alpha tool to track</td></tr>
+              <tr><td>C · Every screenshot on a device farm (Firebase Test Lab, emulator.wtf)</td><td class="num" id="o-c-wall">–</td><td class="num" id="o-c-min">–</td><td class="num" id="o-c-cost">–</td><td>All shots</td><td>The vendor, but we can't pin their image. Goldens must be recorded on the farm, and queue time is extra</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">Formulas:</p>
+        <ul class="small muted">
+          <li><strong>A:</strong> each shard pays for a build and a boot. The wall time adds the captures split across shards.</li>
+          <li><strong>B:</strong> the device lane and the JVM lane run in parallel, so the wall time is the slower of the two.</li>
+          <li><strong>C:</strong> one build on our runner, plus device-minutes on the farm, with one setup minute per shard.</li>
+        </ul>
+        <p class="small muted">The default prices are placeholders: a 4-core Linux runner and about $1 per virtual-device hour. Check them against current GitHub and Firebase pricing.</p>
+      </div>
+      <p class="prose">Why B wins with these defaults: the emulator only runs the screens a device is needed for. That roughly halves CI minutes compared with A, and it shortens PR feedback without lowering fidelity where fidelity matters. If the spike shows emulator captures are much cheaper than assumed, moving to A is a change to the shard count, not a redesign.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Tool</th><th>Renders on</th><th>Real system UI</th><th>Role in this plan</th><th>Status, Nov 2026</th></tr></thead>
+          <tbody>
+            <tr><td>Dropshots</td><td>Device / emulator</td><td>Yes</td><td>The emulator lane. It asserts inside the test, so failures show up in the IDE and JUnit report</td><td>0.6.0 (Mar 2026). See Risks for two plugin gaps the kit works around</td></tr>
+            <tr><td>Compose Preview Screenshot Testing</td><td>JVM · LayoutLib</td><td>No</td><td>The JVM lane: <code>@PreviewTest</code> and the screen matrix</td><td>AGP test suites need 9.5.0-alpha03+ (9.5.1 is the current stable). The docs show engine <code>alpha16</code>; <code>alpha17</code> is published</td></tr>
+            <tr><td>Roborazzi</td><td>JVM · Robolectric</td><td>No</td><td>JVM screens that need interaction or Hilt first</td><td>1.78.0</td></tr>
+            <tr><td>Testify</td><td>Device / emulator</td><td>Yes</td><td>An alternative to Dropshots, with comparison on the host side</td><td>Community-maintained; check activity before adopting</td></tr>
+            <tr><td>Paparazzi</td><td>JVM · LayoutLib</td><td>No</td><td>Keep if a View-based module already uses it</td><td>Mature</td></tr>
+            <tr><td>Firebase Test Lab via Gradle Managed Devices</td><td>Hosted devices</td><td>Yes</td><td>Option C, or occasional checks on physical devices</td><td><code>com.google.firebase.testlab</code> 0.0.1-alpha05</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="proposal">
+      <span class="eyebrow">04 · Proposal</span>
+      <h2>Option B: the emulator lane, plus a JVM lane that keeps it small</h2>
+      <p class="prose">The emulator lane is the core of the proposal, and the JVM lane is what makes it affordable. A screenshot belongs on the emulator only if it needs the real window manager, real system UI or a real GPU surface. The test states why in a required annotation parameter, <code>@DeviceScreenshot(reason = "…")</code>, which reviewers see in the diff.</p>
+      <div class="lanes">
+        <div class="lane b">
+          <span class="lane-tag">Lane B · Emulator · PRs that touch UI</span>
+          <h3>Dropshots on one pinned, CPU-rendered emulator, API matching targetSdk</h3>
+          <dl>
+            <dt>Covers</dt><dd>Edge-to-edge and insets, status and navigation bar contrast in light and dark, notifications, PiP, WebView, SurfaceView, the first frame after launch</dd>
+            <dt>Developers run</dt><dd><code>./shots verify feature:checkout</code></dd>
+            <dt>Goldens</dt><dd><code>src/androidTest/screenshots/</code> in Git LFS, recorded only on CI</dd>
+            <dt>Target</dt><dd>≤ 12 min wall time at p90, ≤ 15% of all screenshots</dd>
+          </dl>
+        </div>
+        <div class="lane">
+          <span class="lane-tag">Lane A · JVM · every PR</span>
+          <h3>Compose Preview Screenshot Testing, with Roborazzi where interaction is needed</h3>
+          <dl>
+            <dt>Covers</dt><dd>Components × themes × font scales; the 9-size screen matrix; loading, empty and error states</dd>
+            <dt>Developers run</dt><dd><code>./gradlew testScreenshotTestDefaultDebugTestSuite</code></dd>
+            <dt>Goldens</dt><dd><code>src/screenshotTestDefaultDebug/reference/</code></dd>
+            <dt>Target</dt><dd>≤ 4 min wall time at p90, no emulator needed</dd>
+          </dl>
+        </div>
+      </div>
+      <p class="prose small muted">Behavior UI tests, navigation tests and Room tests stay as the skill describes. They run on Robolectric in <code>test</code>, or on Gradle Managed Devices in <code>androidTest</code>. They don't use Lane B's strict pixel contract.</p>
+    </section>
+
+    <section id="contract">
+      <span class="eyebrow">05 · Robustness · our design</span>
+      <h2>The determinism contract for the emulator lane</h2>
+      <p class="prose">There are four layers. Each one removes a class of false failures, and each is enforced by a script or a rule rather than by convention. When the environment is wrong, the run fails with "environment drifted" before any pixels are compared, so nobody has to dig through 300 diff images to find the cause.</p>
+      <div class="layers">
+        <div class="layer">
+          <div><h3>Device</h3><p class="why">Same inputs give the same pixels</p></div>
+          <ul>
+            <li>One AVD, defined by a <code>config.ini</code> checked into git: 1080×2400 at 420 dpi, <code>hw.keyboard=yes</code>, SwiftShader, no cameras, forced cold boot.</li>
+            <li>A <code>default;x86_64</code> system image at API 35 or 36, whichever matches <code>targetSdk</code>. Never an <code>-atd</code> image.</li>
+            <li>The emulator build and system image are downloaded by URL and verified by sha256 from <code>emulator.lock</code>, then cached by the lock file's hash. Nothing comes from the runner's preinstalled SDK.</li>
+            <li>Before tests run, the lock is checked against the emulator version, the image revision and <code>ro.build.fingerprint</code>.</li>
+            <li>Linux x86_64 runner with KVM. One emulator per CI job, because the Dropshots tasks call <code>adb</code> without choosing a device.</li>
+          </ul>
+        </div>
+        <div class="layer">
+          <div><h3>System</h3><p class="why">Nothing outside the app changes</p></div>
+          <ul>
+            <li>At boot:
+              <ul>
+                <li>Animation scales set to 0, font scale 1.0, <code>en-US</code>, <code>Etc/UTC</code>, 3-button navigation.</li>
+                <li><code>hide_error_dialogs 1</code>, <code>svc power stayon true</code>, keyguard dismissed.</li>
+                <li>Spell checker off, IME suppressed.</li>
+                <li>A check that no ANR dialog is showing.</li>
+              </ul>
+            </li>
+            <li>Per test: demo mode on (12:00, full battery, separate Wi-Fi and mobile broadcasts, notifications hidden), then a 300 ms wait for it to settle. It exits after the test.</li>
+            <li>Night mode is set with <code>cmd uimode night yes|no</code> before the activity launches, then reset.</li>
+          </ul>
+        </div>
+        <div class="layer">
+          <div><h3>App</h3><p class="why">Inputs are fixtures, not live data</p></div>
+          <ul>
+            <li>A Hilt test runner. <code>@TestInstallIn</code> swaps in fake repositories, a fixed <code>Clock</code> and a fake image loader.</li>
+            <li>UI state comes from a shared <code>:fixtures</code> module per feature, used by both lanes, so the device and JVM shots show the same state.</li>
+            <li>The Compose <code>mainClock</code> is paused and advanced by a fixed amount. Bundled fonts only.</li>
+            <li>No Test Orchestrator in Lane B. Each capture starts a fresh <code>ActivityScenario</code>, and this avoids a reported storage-permission issue in the shared Downloads folder (Dropshots #74).</li>
+          </ul>
+        </div>
+        <div class="layer">
+          <div><h3>Capture and compare</h3><p class="why">Strict, with no retries on mismatch</p></div>
+          <ul>
+            <li>Stable capture: take full-screen screenshots until two in a row are identical (up to 6 tries, 100 ms apart). If the screen never settles, the failure is reported as infrastructure, not pixels.</li>
+            <li>Dropshots' default comparison: <code>SimpleImageComparator(maxDistance = 0.004f)</code> and <code>CountValidator(0)</code>. Any looser threshold needs a written reason.</li>
+            <li><code>recordOnFailure = false</code>, so a crash screen can never become a golden. Before recording, existing goldens are deleted so that orphaned images disappear.</li>
+            <li>Mismatches are never retried. Quarantine needs an issue link and an expiry date.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="adopt">
+      <span class="eyebrow">06 · Developer experience</span>
+      <h2>Any developer can add a screenshot test in 15 minutes</h2>
+      <p class="prose">Adoption fails when every team has to learn the determinism contract. In this plan the contract is built into a small kit: developers write content and a fixture, and the kit handles everything else. Most developers will only ever write Lane A previews.</p>
+      <div class="dx">
+        <div class="stack">
+          <h3>Adding an emulator screenshot</h3>
+          <ol class="steps">
+            <li><div><strong>Apply the plugin once per module.</strong> <span class="muted">Add <code>id("example.screenshots.device")</code> to the module's <code>build.gradle.kts</code>. It brings in Dropshots, the Hilt runner, the kit library and safe defaults.</span></div></li>
+            <li><div><strong>Scaffold the test.</strong> <span class="muted">Run <code>./shots new feature:checkout CheckoutScreen</code>. It creates the test class with <code>DeviceShotRule</code> and a fixture stub, with a <code>reason</code> placeholder to fill in.</span></div></li>
+            <li><div><strong>Fill in the content and run it.</strong> <span class="muted"><code>./shots verify feature:checkout</code> boots an emulator if none is running. On a Mac the result is advisory, and the first run reports "reference missing" as expected.</span></div></li>
+            <li><div><strong>Open the PR and add the <code>record-shots</code> label.</strong> <span class="muted">CI records on the pinned emulator and pushes the goldens to your branch. The bot comments with the images, a design-system owner approves, and you merge.</span></div></li>
+          </ol>
+        </div>
+        <div class="stack">
+          <h3>What the kit provides</h3>
+          <dl class="kit">
+            <div><dt>Convention plugin</dt><dd>Applies Dropshots with <code>recordOnFailure = false</code>, the Hilt runner, disabled animations and the kit dependency</dd></div>
+            <div><dt>DeviceShotRule</dt><dd>Hilt, demo mode, night mode, the fingerprint check, stable capture and the Dropshots folder fix. A test needs one <code>capture()</code> call</dd></div>
+            <div><dt>@DeviceScreenshot(reason)</dt><dd>Marks a Lane B test; the reason is required. CI runs only tests with this annotation</dd></div>
+            <div><dt>@ScreenMatrix · @ThemeVariants</dt><dd>The skill's 9 sizes, plus themes and font scale 1.5, as multipreview annotations for Lane A</dd></div>
+            <div><dt>./shots</dt><dd><code>new</code>, <code>verify</code> and <code>record</code>. It boots the right emulator and passes the right arguments, so nobody needs adb</dd></div>
+            <div><dt>record-shots label</dt><dd>Records goldens on CI and pushes them to the PR branch</dd></div>
+            <div><dt>PR bot comment</dt><dd>Reference, actual and diff images inline in the PR</dd></div>
+            <div><dt>docs/testing.md + AGENTS.md</dt><dd>One page for people, and rules coding agents follow (with <code>android skills add testing-setup</code>)</dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="stack">
+        <h3>Definition of done for a screenshot test</h3>
+        <ul class="checklist">
+          <li><div>The test is in Lane A, unless the screen depends on system UI. Lane B tests have a specific <code>reason</code>.</div></li>
+          <li><div>State comes from a named fixture in the feature's <code>:fixtures</code> module. No network access, no real clock.</div></li>
+          <li><div>The test covers light and dark if the screen draws behind the system bars.</div></li>
+          <li><div>Names describe the state (<code>loaded_dark</code>), not an index. Dropshots rejects duplicate names.</div></li>
+          <li><div>Goldens were recorded by CI, not locally, and a design-system owner approved them.</div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="code">
+      <span class="eyebrow">07 · Reference implementation</span>
+      <h2>What it looks like in the repo</h2>
+      <div class="tabs" role="tablist" aria-label="Reference files">
+        <button role="tab" id="tab-test" aria-controls="p-test" aria-selected="true">What a developer writes</button>
+        <button role="tab" id="tab-rule" aria-controls="p-rule" aria-selected="false">DeviceShotRule.kt</button>
+        <button role="tab" id="tab-plugin" aria-controls="p-plugin" aria-selected="false">Convention plugin</button>
+        <button role="tab" id="tab-matrix" aria-controls="p-matrix" aria-selected="false">Lane A annotations</button>
+        <button role="tab" id="tab-shots" aria-controls="p-shots" aria-selected="false">./shots</button>
+        <button role="tab" id="tab-boot" aria-controls="p-boot" aria-selected="false">boot.sh + lock</button>
+        <button role="tab" id="tab-ci" aria-controls="p-ci" aria-selected="false">device-shots.yml</button>
+        <button role="tab" id="tab-agents" aria-controls="p-agents" aria-selected="false">AGENTS.md</button>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-test" aria-labelledby="tab-test">
+<pre><span class="c">// feature/checkout/src/androidTest/kotlin/com/example/checkout/CheckoutDeviceShots.kt
+// Generated by: ./shots new feature:checkout CheckoutScreen</span>
+@DeviceScreenshot(reason = <span class="k">"Status-bar icon contrast over the edge-to-edge hero image"</span>)
+@HiltAndroidTest
+class CheckoutDeviceShots {
+  @get:Rule val shots = DeviceShotRule(this)
+
+  @Test fun loaded_light() = shots.capture(<span class="k">"loaded_light"</span>, group = <span class="k">"checkout"</span>) {
+    CheckoutScreen(CheckoutFixtures.loaded)
+  }
+
+  @Test fun loaded_dark() = shots.capture(<span class="k">"loaded_dark"</span>, group = <span class="k">"checkout"</span>, night = true) {
+    CheckoutScreen(CheckoutFixtures.loaded)
+  }
+}
+
+<span class="c">// Lane A: what most developers write instead.
+// feature/checkout/src/screenshotTest/kotlin/com/example/checkout/CheckoutPreviews.kt</span>
+@PreviewTest
+@ScreenMatrix
+@Composable
+fun CheckoutLoaded() = AppTheme { CheckoutScreen(CheckoutFixtures.loaded) }</pre>
+        <p class="note">That's the whole test. The rule handles Hilt, system UI, night mode, waiting for a stable frame and comparison. <code>CheckoutFixtures</code> lives in <code>:feature:checkout:fixtures</code>, so both lanes render the same state.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-rule" aria-labelledby="tab-rule" hidden>
+<pre><span class="c">// core/screenshot-testing/src/main/kotlin/com/example/testing/DeviceShotRule.kt</span>
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class DeviceScreenshot(val reason: String)
+
+class DeviceShotRule(testInstance: Any) : TestRule {
+  private val instrumentation = InstrumentationRegistry.getInstrumentation()
+  private val args = InstrumentationRegistry.getArguments()
+
+  <span class="c">// Dropshots 0.6.0: the Gradle plugin uses the *test* APK id for its device folder, but the
+  // runtime defaults to the *app* id, so record and pull miss in app modules (dropbox/dropshots#115).
+  // Point both at the test APK's folder.</span>
+  private val shotDir = File(
+    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+    <span class="k">"screenshots/${instrumentation.context.packageName}"</span>,
+  )
+  private val dropshots = Dropshots(
+    recordScreenshots = File(shotDir, <span class="k">".isRecordingScreenshots"</span>).exists(),
+    rootScreenshotDirectory = shotDir,
+  )
+  val compose = createEmptyComposeRule()
+
+  private val chain = RuleChain
+    .outerRule(HiltAndroidRule(testInstance))
+    .around(SystemUiFreeze())
+    .around(compose)
+    .around(dropshots)
+
+  override fun apply(base: Statement, description: Description): Statement = chain.apply(base, description)
+
+  fun capture(name: String, group: String, night: Boolean = false, content: @Composable () -> Unit) {
+    <span class="c">// Must be set before launch so enableEdgeToEdge() picks matching system-bar icons.</span>
+    shell(<span class="k">"cmd uimode night ${if (night) "yes" else "no"}"</span>)
+    compose.mainClock.autoAdvance = false
+    <span class="c">// HiltTestActivity lives in :core:screenshot-testing's debug source set and calls enableEdgeToEdge().</span>
+    ActivityScenario.launch(HiltTestActivity::class.java).use { scenario ->
+      scenario.onActivity { it.setContent { AppTheme { content() } } }
+      compose.mainClock.advanceTimeBy(1_000)
+      compose.waitForIdle()
+      dropshots.assertSnapshot(stableScreenshot(), name, group)
+    }
+  }
+
+  private fun stableScreenshot(): Bitmap {
+    UiDevice.getInstance(instrumentation).waitForIdle()
+    var previous = instrumentation.uiAutomation.takeScreenshot()
+    repeat(5) {
+      SystemClock.sleep(100)
+      val next = instrumentation.uiAutomation.takeScreenshot()
+      if (next.sameAs(previous)) return next
+      previous = next
+    }
+    throw IllegalStateException(<span class="k">"INFRA: screen never settled; not a pixel failure"</span>)
+  }
+
+  private inner class SystemUiFreeze : ExternalResource() {
+    override fun before() {
+      val expected = args.getString(<span class="k">"deviceShots.fingerprint"</span>)
+      val onCi = args.getString(<span class="k">"deviceShots.ci"</span>) == <span class="k">"true"</span>
+      if (expected != null &amp;&amp; Build.FINGERPRINT != expected) {
+        val msg = <span class="k">"Environment drifted: ${Build.FINGERPRINT} != $expected"</span>
+        check(!onCi) { msg }
+        Log.w(<span class="k">"DeviceShots"</span>, <span class="k">"$msg. Local results are advisory."</span>)
+      }
+      shell(<span class="k">"settings put global sysui_demo_allowed 1"</span>)
+      demo(<span class="k">"enter"</span>)
+      demo(<span class="k">"clock -e hhmm 1200"</span>)
+      demo(<span class="k">"battery -e level 100 -e plugged false"</span>)
+      demo(<span class="k">"network -e wifi show -e level 4"</span>)
+      demo(<span class="k">"network -e mobile show -e datatype none -e level 4"</span>)
+      demo(<span class="k">"notifications -e visible false"</span>)
+      SystemClock.sleep(300)
+    }
+    override fun after() {
+      demo(<span class="k">"exit"</span>)
+      shell(<span class="k">"cmd uimode night no"</span>)
+    }
+  }
+
+  private fun demo(command: String) =
+    shell(<span class="k">"am broadcast -a com.android.systemui.demo -e command $command"</span>)
+
+  private fun shell(cmd: String) {
+    <span class="c">// Read to EOF so the command finishes before the test continues.</span>
+    ParcelFileDescriptor.AutoCloseInputStream(instrumentation.uiAutomation.executeShellCommand(cmd))
+      .use { it.readBytes() }
+  }
+}</pre>
+        <p class="note">The fingerprint check is strict only on CI, which passes <code>deviceShots.ci=true</code>. Locally it logs a warning, so developers on Apple Silicon can still look at their screens.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-plugin" aria-labelledby="tab-plugin" hidden>
+<pre><span class="c">// build-logic/convention/src/main/kotlin/DeviceShotsConventionPlugin.kt
+// Registered as id "example.screenshots.device"</span>
+class DeviceShotsConventionPlugin : Plugin&lt;Project&gt; {
+  override fun apply(target: Project) = with(target) {
+    pluginManager.apply(<span class="k">"com.dropbox.dropshots"</span>)   <span class="c">// 0.6.0, pinned in libs.versions.toml</span>
+    extensions.configure&lt;DropshotsExtension&gt; {
+      recordOnFailure.set(false)   <span class="c">// never record a crash dialog as a golden</span>
+    }
+
+    pluginManager.withPlugin(<span class="k">"com.android.application"</span>) {
+      extensions.configure&lt;ApplicationExtension&gt; {
+        defaultConfig.testInstrumentationRunner = <span class="k">"com.example.testing.HiltTestRunner"</span>
+        testOptions.animationsDisabled = true
+      }
+    }
+    pluginManager.withPlugin(<span class="k">"com.android.library"</span>) {
+      extensions.configure&lt;LibraryExtension&gt; {
+        defaultConfig.testInstrumentationRunner = <span class="k">"com.example.testing.HiltTestRunner"</span>
+        testOptions.animationsDisabled = true
+      }
+    }
+
+    val libs = extensions.getByType&lt;VersionCatalogsExtension&gt;().named(<span class="k">"libs"</span>)
+    dependencies {
+      add(<span class="k">"androidTestImplementation"</span>, project(<span class="k">":core:screenshot-testing"</span>))
+      add(<span class="k">"androidTestImplementation"</span>, libs.findLibrary(<span class="k">"hilt-android-testing"</span>).get())
+      add(<span class="k">"kspAndroidTest"</span>, libs.findLibrary(<span class="k">"hilt-compiler"</span>).get())
+    }
+  }
+}
+
+<span class="c">// Any module, once:</span>
+plugins {
+  id(<span class="k">"example.screenshots.device"</span>)
+}</pre>
+        <p class="note"><code>:core:screenshot-testing</code> depends on <code>androidx.test:runner</code> 1.7.0, <code>androidx.test.ext:junit</code> 1.3.0, <code>androidx.test.uiautomator</code>, Compose <code>ui-test-junit4</code> and Dropshots. Versions were checked against Google Maven and Maven Central on 8 Nov 2026.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-matrix" aria-labelledby="tab-matrix" hidden>
+<pre><span class="c">// core/screenshot-testing/src/main/kotlin/com/example/testing/ScreenMatrix.kt
+// The testing-setup skill's Step 8 matrix: 3 widths × 3 heights.</span>
+@Preview(name = <span class="k">"w400-h400"</span>,  widthDp = 400, heightDp = 400)
+@Preview(name = <span class="k">"w400-h500"</span>,  widthDp = 400, heightDp = 500)
+@Preview(name = <span class="k">"w400-h1000"</span>, widthDp = 400, heightDp = 1000)
+@Preview(name = <span class="k">"w610-h400"</span>,  widthDp = 610, heightDp = 400)
+@Preview(name = <span class="k">"w610-h500"</span>,  widthDp = 610, heightDp = 500)
+@Preview(name = <span class="k">"w610-h1000"</span>, widthDp = 610, heightDp = 1000)
+@Preview(name = <span class="k">"w900-h400"</span>,  widthDp = 900, heightDp = 400)
+@Preview(name = <span class="k">"w900-h500"</span>,  widthDp = 900, heightDp = 500)
+@Preview(name = <span class="k">"w900-h1000"</span>, widthDp = 900, heightDp = 1000)
+annotation class ScreenMatrix
+
+<span class="c">// Phone-size variations: alternative themes and font scale 1.5.</span>
+@Preview(name = <span class="k">"dark"</span>, widthDp = 400, heightDp = 500, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = <span class="k">"font-1.5"</span>, widthDp = 400, heightDp = 500, fontScale = 1.5f)
+annotation class ThemeVariants
+
+<span class="c">// gradle.properties (root), for AGP 9.5.0-alpha03+ modules:
+// android.experimental.enableScreenshotTest=true
+// android.experimental.testSuiteSupport=true
+//
+// module build.gradle.kts:
+// android { testOptions { screenshotTests.create("screenshotTest") {
+//   engineVersion = "0.0.1-alpha16"; targetVariants.add("debug")
+//   dependencies { implementation(libs.androidx.compose.ui.tooling)
+//     implementation("com.android.tools.screenshot:screenshot-validation-api:0.0.1-alpha16") } } } }</span></pre>
+        <p class="note">Modules below AGP 9.5.0-alpha03 use the deprecated <code>com.android.compose.screenshot</code> plugin until they're upgraded, and the upgrade is a separate decision. A module never uses both setups at once.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-shots" aria-labelledby="tab-shots" hidden>
+<pre>#!/usr/bin/env bash
+<span class="c"># ./shots: the one command for device screenshots.
+#   ./shots new    &lt;module&gt; &lt;ScreenName&gt;   scaffold a test class and fixture stub
+#   ./shots verify &lt;module&gt; [gradle args]  compare against goldens (advisory off CI)
+#   ./shots record &lt;module&gt;                re-record goldens (CI only; use the record-shots label)</span>
+set -euo pipefail
+source ci/emulator/emulator.lock
+cmd=${1:?usage: ./shots new|verify|record &lt;module&gt;}; module=${2:-app}; dir=${module//://}
+shift $(( $# &gt;= 2 ? 2 : $# ))
+
+args=(
+  -Pandroid.testInstrumentationRunnerArguments.annotation=com.example.testing.DeviceScreenshot
+  -Pandroid.testInstrumentationRunnerArguments.deviceShots.fingerprint="$EXPECTED_FINGERPRINT"
+)
+[[ "${CI:-}" == "true" ]] &amp;&amp; args+=(-Pandroid.testInstrumentationRunnerArguments.deviceShots.ci=true)
+
+case "$cmd" in
+  new)
+    exec ci/shots/scaffold.sh "$dir" "${1:?ScreenName}" ;;
+  verify)
+    ci/emulator/boot.sh --reuse
+    ./gradlew ":$module:connectedDebugAndroidTest" "${args[@]}" "$@"
+    echo "Diffs: $dir/build/test-results/dropshots/" ;;
+  record)
+    [[ "${CI:-}" == "true" ]] || { echo "Goldens are recorded on CI. Add the 'record-shots' label to your PR."; exit 1; }
+    ci/emulator/boot.sh
+    find "$dir/src/androidTest/screenshots" -name '*.png' -delete 2&gt;/dev/null || true   <span class="c"># drop orphaned goldens</span>
+    ./gradlew ":$module:recordDebugAndroidTestScreenshots" "${args[@]}" ;;
+  *) echo "unknown command: $cmd"; exit 2 ;;
+esac</pre>
+        <p class="note">Developers never type adb commands or instrumentation arguments. The scaffold writes the test from the template on the first tab, plus a <code>CheckoutFixtures</code> stub if one doesn't exist.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-boot" aria-labelledby="tab-boot" hidden>
+<pre><span class="c"># ci/emulator/emulator.lock  (values recorded in week 1; changed only by an upgrade PR)</span>
+API=35
+EMULATOR_URL=https://dl.google.com/android/repository/emulator-linux_x64-&lt;build-id&gt;.zip
+EMULATOR_SHA256=&lt;sha256&gt;
+EMULATOR_VERSION="&lt;first line of: emulator -version&gt;"
+SYSIMG_URL=https://dl.google.com/android/repository/sys-img/android/x86_64-35_r&lt;rev&gt;.zip
+SYSIMG_SHA256=&lt;sha256&gt;
+EXPECTED_FINGERPRINT=&lt;ro.build.fingerprint&gt;
+
+<span class="c"># ci/emulator/boot.sh</span>
+#!/usr/bin/env bash
+set -euo pipefail
+source ci/emulator/emulator.lock
+if [[ "$(uname -m)" == "arm64" ]]; then
+  echo "Local arm64 emulator: results are advisory. Goldens are recorded on CI (x86_64)."
+  exec ci/emulator/boot-local.sh "$@"
+fi
+if [[ "${1:-}" == "--reuse" ]] &amp;&amp; adb get-state &amp;&gt;/dev/null; then exit 0; fi
+
+SDK=${ANDROID_SDK_ROOT:?}; CACHE=.cache/emu; mkdir -p "$CACHE" build
+fetch() { [[ -f "$3" ]] || curl -fsSL "$1" -o "$3"; echo "$2  $3" | sha256sum -c - ; }
+fetch "$EMULATOR_URL" "$EMULATOR_SHA256" "$CACHE/emulator.zip"
+fetch "$SYSIMG_URL"  "$SYSIMG_SHA256"  "$CACHE/sysimg.zip"
+rm -rf "$SDK/emulator" &amp;&amp; unzip -q "$CACHE/emulator.zip" -d "$SDK"
+IMG="$SDK/system-images/android-$API/default"; rm -rf "$IMG" &amp;&amp; mkdir -p "$IMG"
+unzip -q "$CACHE/sysimg.zip" -d "$IMG"
+[[ "$("$SDK/emulator/emulator" -version | head -1)" == "$EMULATOR_VERSION" ]] || { echo "::error::emulator version drift"; exit 1; }
+
+<span class="c"># The AVD is defined by files in git, not by avdmanager defaults.</span>
+AVD="$HOME/.android/avd"; mkdir -p "$AVD/shots.avd"
+printf 'avd.ini.encoding=UTF-8\npath=%s\ntarget=android-%s\n' "$AVD/shots.avd" "$API" &gt; "$AVD/shots.ini"
+cp ci/emulator/config.ini "$AVD/shots.avd/config.ini"   <span class="c"># hw.keyboard=yes, 1080x2400@420, swiftshader</span>
+
+"$SDK/emulator/emulator" -avd shots -no-window -no-audio -no-boot-anim -no-snapshot \
+  -gpu swiftshader_indirect -change-locale en-US -timezone Etc/UTC &gt; build/emulator.log 2&gt;&amp;1 &amp;
+timeout 120 adb wait-for-device
+timeout 420 bash -c 'until [[ "$(adb shell getprop sys.boot_completed | tr -d "\r")" == "1" ]]; do sleep 3; done' \
+  || { echo "::error::boot timeout"; exit 75; }
+adb logcat -v threadtime &gt; build/logcat.txt &amp;
+
+a() { adb shell "$@"; }
+for s in window_animation_scale transition_animation_scale animator_duration_scale; do a settings put global "$s" 0; done
+a settings put system font_scale 1.0
+a settings put secure show_ime_with_hard_keyboard 0
+a settings put secure spell_checker_enabled 0
+a settings put global hide_error_dialogs 1
+a settings put system screen_off_timeout 2147483647
+a svc power stayon true
+a wm dismiss-keyguard
+a cmd overlay enable com.android.internal.systemui.navbar.threebutton
+a cmd uimode night no
+sleep 5
+a dumpsys window | grep -qi 'not responding' &amp;&amp; { echo "::error::ANR dialog after boot"; exit 75; }
+
+actual=$(a getprop ro.build.fingerprint | tr -d '\r')
+[[ "$actual" == "$EXPECTED_FINGERPRINT" ]] || { echo "::error::image drift: $actual"; exit 1; }</pre>
+        <p class="note">Exit code 75 means an infrastructure failure, and CI retries the boot once. Exit code 1 means drift and fails immediately. The download URLs and checksums get filled in during week 1 and change only through a reviewed upgrade PR (see the runbook).</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-ci" aria-labelledby="tab-ci" hidden>
+<pre>name: device-shots
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  schedule: [ { cron: "0 3 * * *" } ]     <span class="c"># nightly false-failure tracking on main</span>
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  changes:                                 <span class="c"># always runs, so the required check never sits "pending"</span>
+    runs-on: ubuntu-24.04
+    outputs: { ui: ${{ steps.f.outputs.ui }} }
+    steps:
+      - uses: actions/checkout@v4
+      - id: f
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            ui:
+              - '**/src/main/**'
+              - '**/src/androidTest/**'
+              - '**/build.gradle.kts'
+              - 'gradle/libs.versions.toml'
+              - 'build-logic/**'
+              - 'ci/emulator/**'
+              - '.github/workflows/device-shots.yml'
+
+  verify:
+    needs: changes
+    if: needs.changes.outputs.ui == 'true' || github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix: { shard: [0, 1] }            <span class="c"># one emulator per job: Dropshots' adb calls don't pick a device</span>
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: actions/cache@v4
+        with: { path: .cache/emu, key: "emu-${{ hashFiles('ci/emulator/emulator.lock') }}" }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules &amp;&amp; sudo udevadm trigger --name-match=kvm
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Boot pinned emulator (one retry, infrastructure only)
+        run: ci/emulator/boot.sh || { [ $? -eq 75 ] &amp;&amp; ci/emulator/boot.sh; }
+      - name: Verify
+        env: { CI: "true" }
+        run: |
+          ./shots verify app \
+            -Pandroid.testInstrumentationRunnerArguments.numShards=2 \
+            -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shots-${{ matrix.shard }}
+          path: |
+            **/build/test-results/dropshots/
+            build/emulator.log
+            build/logcat.txt
+
+  gate:                                    <span class="c"># make THIS the required check</span>
+    needs: [changes, verify]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: '[[ "${{ needs.verify.result }}" =~ ^(success|skipped)$ ]]'
+
+  record:
+    if: github.event.action == 'labeled' &amp;&amp; github.event.label.name == 'record-shots'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - id: app                            <span class="c"># an App token, so the pushed commit re-triggers CI</span>
+        uses: actions/create-github-app-token@v1
+        with: { app-id: "${{ vars.SHOTS_APP_ID }}", private-key: "${{ secrets.SHOTS_APP_KEY }}" }
+      - uses: actions/checkout@v4
+        with: { ref: "${{ github.head_ref }}", token: "${{ steps.app.outputs.token }}", lfs: true }
+      <span class="c"># ...same java / cache / KVM / gradle / boot steps as verify...</span>
+      - run: ./shots record app
+        env: { CI: "true" }
+      - name: Push goldens to the PR branch
+        run: |
+          git config user.name "shots-bot"
+          git config user.email "shots-bot@users.noreply.github.com"
+          git add -A -- ':(glob)**/src/androidTest/screenshots/**'
+          git commit -m "Re-record device screenshots" || exit 0
+          git push</pre>
+        <p class="note">PRs from forks can't use the record label, because secrets aren't available to them. A maintainer records on a branch in this repository instead. <code>.gitattributes</code> puts <code>**/src/androidTest/screenshots/**/*.png</code> in LFS.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-agents" aria-labelledby="tab-agents" hidden>
+<pre>## Screenshot tests
+Full guide: docs/testing.md. Base skill: `android skills add testing-setup`.
+
+- Default to Lane A (JVM): put `@PreviewTest` + `@ScreenMatrix` or `@ThemeVariants`
+  in `src/screenshotTest/kotlin`. Run `./gradlew testScreenshotTestDefaultDebugTestSuite`.
+- Use Lane B (emulator) only when the screen depends on system UI: edge-to-edge or insets,
+  system-bar contrast, notifications, picture-in-picture, WebView, SurfaceView.
+  - Scaffold with `./shots new &lt;module&gt; &lt;Screen&gt;`. Use `DeviceShotRule`.
+  - `@DeviceScreenshot(reason = "...")` is required; name the system-UI dependency.
+  - State comes from the feature's `:fixtures` module. Never hit the network or the real clock.
+- Never record Lane B goldens locally. Ask for the `record-shots` PR label.
+- Never raise a Dropshots threshold without a comment explaining why.</pre>
+        <p class="note">This follows the skill's final step: update <code>AGENTS.md</code> if it exists, or create it and link to <code>docs/testing.md</code>. Coding agents then add tests the same way people do.</p>
+      </div>
+    </section>
+
+    <section id="goldens">
+      <span class="eyebrow">08 · Workflow</span>
+      <h2>Golden lifecycle</h2>
+      <ol class="steps">
+        <li><div><strong>Developer changes UI.</strong> <span class="muted">Lane A runs locally in seconds. <code>./shots verify</code> gives an advisory look at Lane B on a local emulator.</span></div></li>
+        <li><div><strong>PR opens.</strong> <span class="muted">The <code>gate</code> check runs the emulator lane if UI paths changed. On a mismatch, the bot comments with reference, actual and diff images.</span></div></li>
+        <li><div><strong>The change is intended.</strong> <span class="muted">The author adds the <code>record-shots</code> label. CI deletes the old goldens, records new ones on the pinned emulator and pushes a commit to the branch, and the push re-runs <code>gate</code>.</span></div></li>
+        <li><div><strong>Review.</strong> <span class="muted">CODEOWNERS on <code>**/screenshots/**</code> and <code>**/reference/**</code> requires a design-system owner's approval. Code and images are reviewed in the same PR.</span></div></li>
+        <li><div><strong>Merge and monitor.</strong> <span class="muted">A nightly run on <code>main</code> records the false-failure rate per capture and per run, and posts to the team channel if it's not zero.</span></div></li>
+      </ol>
+    </section>
+
+    <section id="runbook">
+      <span class="eyebrow">09 · Operations</span>
+      <h2>Running the emulator</h2>
+      <div class="two">
+        <div class="stack">
+          <h3>Upgrading the image (quarterly, or when targetSdk changes)</h3>
+          <ol class="steps">
+            <li><div>Open a branch and update the URLs and checksums in <code>emulator.lock</code>, plus <code>API</code> if needed.</div></li>
+            <li><div>Run the record workflow. Every Lane B golden changes in one commit, together with the new <code>EXPECTED_FINGERPRINT</code>.</div></li>
+            <li><div>A design-system owner reviews a sample of the diffs. Expect broad sub-pixel changes and look for layout changes.</div></li>
+            <li><div>Run 10 cold-boot verify runs on the branch. Merge only if every run is clean.</div></li>
+          </ol>
+        </div>
+        <div class="tbl-wrap">
+          <table style="min-width:0">
+            <thead><tr><th>Symptom</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>Boot timeout (exit 75)</td><td>CI retries automatically. If it repeats, check KVM on the runner and look in <code>emulator.log</code></td></tr>
+              <tr><td>"image drift" or "emulator version drift"</td><td>Something bypassed the lock. Check the cache key and the SDK path</td></tr>
+              <tr><td>"INFRA: screen never settled"</td><td>A running animation or a looping loader. Check the fixture and pause the clock</td></tr>
+              <tr><td>Diff only in the status bar</td><td>Demo mode didn't apply. Check logcat for the SystemUI broadcast</td></tr>
+              <tr><td>Empty diff artifact</td><td>The Dropshots folder doesn't match. Make sure the test uses <code>DeviceShotRule</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="prose small muted">Owner: one named engineer for the contract, the lock file and the nightly report, with a second engineer as backup. They expect about 2 hours a month after rollout.</p>
+    </section>
+
+    <section id="rollout">
+      <span class="eyebrow">10 · Plan</span>
+      <h2>Rollout: 7 weeks, 1 engineer</h2>
+      <div class="phases">
+        <div class="phase">
+          <span class="when">Week 1 · go / no-go</span>
+          <h3>Audit and determinism spike</h3>
+          <ul>
+            <li>Run the skill's Step 1 analysis and share the report</li>
+            <li>Fill in <code>emulator.lock</code> and <code>config.ini</code></li>
+            <li>Run 20 cold boots on at least 5 runner hosts, with at least 30 captures each</li>
+            <li>Measure the real calculator inputs</li>
+          </ul>
+          <p class="exit">Exit: 0 mismatches in 600+ captures (95% upper bound ≤ 0.5%)</p>
+        </div>
+        <div class="phase">
+          <span class="when">Weeks 2–3</span>
+          <h3>The kit</h3>
+          <ul>
+            <li>DeviceShotRule, the convention plugin, <code>./shots</code> and the scaffold</li>
+            <li>The <code>@ScreenMatrix</code> and <code>@ThemeVariants</code> annotations</li>
+            <li>A <code>:fixtures</code> pattern for one feature</li>
+          </ul>
+          <p class="exit">Exit: the kit's own tests pass on CI</p>
+        </div>
+        <div class="phase">
+          <span class="when">Weeks 3–4</span>
+          <h3>Pilot feature</h3>
+          <ul>
+            <li>Edge-to-edge light and dark, one notification, PiP if relevant</li>
+            <li>Lane A matrix for the top 10 screens</li>
+            <li>3 developers new to the kit each add a test, and we time them</li>
+          </ul>
+          <p class="exit">Exit: time to a first test ≤ 15 min, non-blocking with 0 false failures</p>
+        </div>
+        <div class="phase">
+          <span class="when">Weeks 5–6</span>
+          <h3>CI hardening</h3>
+          <ul>
+            <li>The <code>gate</code> check, the record label, the GitHub App token and the PR bot comment</li>
+            <li>LFS, CODEOWNERS, the quarantine policy</li>
+            <li>The nightly false-failure report</li>
+          </ul>
+          <p class="exit">Exit: <code>gate</code> becomes a required check</p>
+        </div>
+        <div class="phase">
+          <span class="when">Week 7</span>
+          <h3>Handover</h3>
+          <ul>
+            <li><code>docs/testing.md</code> and <code>AGENTS.md</code>, after confirming with the team as the skill asks</li>
+            <li>A 30-minute walkthrough for developers, and a runbook handover to the owner</li>
+          </ul>
+          <p class="exit">Exit: two more teams onboard using only the docs</p>
+        </div>
+        <div class="phase">
+          <span class="when">Later, optional</span>
+          <h3>A Gradle Managed Device bridge</h3>
+          <ul>
+            <li>Evaluate Dropshots PR #82, which writes to additional test output, or an equivalent adapter</li>
+            <li>That would let Lane B run on a GMD, with AGP managing the device lifecycle</li>
+          </ul>
+          <p class="exit">Only if it beats the scripted emulator on stability</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="metrics">
+      <span class="eyebrow">11 · Measures</span>
+      <h2>How we'll know it works</h2>
+      <p class="prose small muted">These are targets. Week 1 sets the baseline. False-failure rates are reported per capture and per run. With zero failures in n captures, the 95% upper bound on the rate is 3/n, so proving "below 0.5%" needs at least 600 clean captures.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Measure</th><th>Target</th><th>Measured by</th><th>Why it matters</th></tr></thead>
+          <tbody>
+            <tr><td>False failures, Lane B</td><td class="num">0 observed; ≤ 0.5% upper bound</td><td>Nightly on main: captures per night × 30 nights</td><td>A red check means the UI changed</td></tr>
+            <tr><td>Time to a first test</td><td class="num">≤ 15 min</td><td>Timed pilot with 3 developers</td><td>Adoption depends on how easy the first test is</td></tr>
+            <tr><td>Lane B wall time</td><td class="num">≤ 12 min p90</td><td>CI job duration</td><td>Fast enough to stay a PR check</td></tr>
+            <tr><td>Lane A wall time</td><td class="num">≤ 4 min p90</td><td>CI job duration</td><td>Fast feedback for most UI changes</td></tr>
+            <tr><td>Goldens recorded on CI</td><td class="num">100%</td><td>Commit author on screenshot paths is the bot</td><td>Rules out arm64 vs x86_64 differences</td></tr>
+            <tr><td>Lane B share of screenshots</td><td class="num">≤ 15%</td><td>Count of <code>@DeviceScreenshot</code> captures</td><td>Keeps the expensive lane focused</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="risks">
+      <span class="eyebrow">12 · Risks</span>
+      <h2>Risks and how we handle them</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr></thead>
+          <tbody>
+            <tr><td>Dropshots folder mismatch in app modules</td><td><span class="pill hi">Known</span></td><td>In 0.6.0 the plugin uses the test APK id and the runtime uses the app id (fix pending in #115). <code>DeviceShotRule</code> sets <code>rootScreenshotDirectory</code> to match. Drop the workaround once a release includes the fix</td></tr>
+            <tr><td>Dropshots doesn't work with Gradle Managed Devices</td><td><span class="pill hi">Known</span></td><td>Its record and pull tasks attach only to <code>connected…AndroidTest</code> over adb (#31). Lane B uses the scripted emulator; a GMD bridge is an optional later phase (#82)</td></tr>
+            <tr><td>Dropshots' adb calls don't choose a device</td><td><span class="pill md">Known</span></td><td>One emulator per CI job, sharded with <code>numShards</code> and <code>shardIndex</code></td></tr>
+            <tr><td>The runner's SDK changes under us</td><td><span class="pill md">Medium</span></td><td>Downloads are pinned and checksummed, <code>config.ini</code> is in git, and the lock is checked before any test runs</td></tr>
+            <tr><td>The AGP screenshot test suites are experimental</td><td><span class="pill md">Medium</span></td><td>Pin the engine version (alpha16 per the docs, or alpha17 if the spike validates it). Lane A goldens can be re-recorded with one task, and Roborazzi is the fallback</td></tr>
+            <tr><td>CPU rendering is slow</td><td><span class="pill md">Medium</span></td><td>Measure in week 1. Lane B stays small by design; add matrix shards if needed</td></tr>
+            <tr><td>Reviewers approve image changes without looking</td><td><span class="pill md">Medium</span></td><td>CODEOWNERS, diff images inline in the PR, and the required <code>reason</code> that frames what to look for</td></tr>
+            <tr><td>Repository grows with images</td><td><span class="pill md">Medium</span></td><td>Git LFS. Lane B's ≤ 15% budget, and orphaned goldens deleted on every record</td></tr>
+            <tr><td>Kit becomes a bottleneck</td><td><span class="pill lo">Low</span></td><td>The kit is small (a rule, a plugin and a script) with a named owner. Teams can still write a plain Dropshots test</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="decide">
+      <span class="eyebrow">13 · Next step</span>
+      <h2>Decisions needed</h2>
+      <ul class="decisions">
+        <li><div><strong>Approve option B</strong>, with the rule that a test runs on the emulator only with a written system-UI <code>reason</code>.</div></li>
+        <li><div><strong>Fund 7 weeks of 1 engineer</strong>, plus about 2 hours a week of design-system review during the pilot.</div></li>
+        <li><div><strong>Provide CI access</strong>: Linux x86_64 runners with KVM, a GitHub App for the record bot, and Git LFS for screenshot directories.</div></li>
+        <li><div><strong>Confirm the emulator API level</strong> that matches the app's targetSdk (35 or 36).</div></li>
+        <li><div><strong>Decide the AGP 9.5 upgrade separately.</strong> Lane A works either way.</div></li>
+        <li><div><strong>Name an owner and a backup</strong> for the determinism contract and the nightly report.</div></li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <span class="eyebrow">Sources</span>
+      <ol class="sources">
+        <li><a href="https://github.com/android/skills/blob/main/testing/testing-setup/SKILL.md">android/skills · testing/testing-setup/SKILL.md</a> (last updated 2026-10-28)</li>
+        <li><a href="https://developer.android.com/studio/preview/compose-screenshot-testing-with-testsuites">Screenshot testing with test suites</a>, Android Developers</li>
+        <li><a href="https://developer.android.com/studio/test/gradle-managed-devices">Gradle Managed Devices</a>: ATD rendering note, <code>swiftshader_indirect</code>, Firebase Test Lab integration</li>
+        <li><a href="https://github.com/dropbox/dropshots">dropbox/dropshots</a>: README, CHANGELOG 0.5.0 and 0.6.0, plugin and runtime source; issues <a href="https://github.com/dropbox/dropshots/issues/31">#31</a> and <a href="https://github.com/dropbox/dropshots/issues/74">#74</a>; PRs <a href="https://github.com/dropbox/dropshots/pull/82">#82</a> and <a href="https://github.com/dropbox/dropshots/pull/115">#115</a></li>
+        <li><a href="https://developer.android.com/reference/kotlin/androidx/test/espresso/screenshot/package-summary">androidx.test.espresso.screenshot</a> and <a href="https://developer.android.com/reference/androidx/test/core/app/DeviceCapture">DeviceCapture</a> references</li>
+        <li><a href="https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs">Triggering further workflow runs</a>: why the record bot uses a GitHub App token</li>
+        <li><a href="https://android-developers.googleblog.com/2021/10/whats-new-in-scalable-automated-testing.html">What's new in scalable automated testing</a>, Android Developers Blog (ATD background)</li>
+        <li>Version numbers from Google Maven and Maven Central metadata, checked 2026-11-08</li>
+      </ol>
+    </section>
+
+    <footer>Prepared for the Android team · November 2026 · Revision 2, after expert review. Code samples are reference sketches to adapt to the app's module and package names. Bracketed values in the lock file are filled in during week 1.</footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function select(tab) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.tabIndex = i === 0 ? 0 : -1;
+    t.addEventListener('click', function () { select(t); });
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      var n = tabs[(i + d + tabs.length) % tabs.length];
+      select(n); n.focus(); e.preventDefault();
+    });
+  });
+
+  function v(id) { var x = parseFloat(document.getElementById(id).value); return isFinite(x) && x >= 0 ? x : 0; }
+  function set(id, text) { document.getElementById(id).textContent = text; }
+  function mins(m) { return m < 60 ? m.toFixed(1) + ' min' : (m / 60).toFixed(1) + ' h'; }
+  function money(x) { return '$' + Math.round(x).toLocaleString('en-US'); }
+
+  function calc() {
+    var N = v('c-total'), p = Math.min(v('c-share'), 100) / 100, sd = v('c-sdev'), sj = v('c-sjvm');
+    var b = v('c-build'), k = v('c-boot'), ma = Math.max(1, Math.round(v('c-sha'))), mb = Math.max(1, Math.round(v('c-shb')));
+    var runs = v('c-runs') * 22, c = v('c-price'), f = v('c-farm');
+
+    // A: every shot on the emulator, sharded.
+    var aCap = N * sd / 60;
+    var aWall = b + k + aCap / ma, aMin = ma * (b + k) + aCap;
+    // B: device share on the emulator, the rest on the JVM, in parallel.
+    var n = Math.round(N * p), bCap = n * sd / 60;
+    var bDevWall = b + k + bCap / mb, bDevMin = mb * (b + k) + bCap;
+    var jvm = b + (N - n) * sj / 60;
+    var bWall = Math.max(bDevWall, jvm), bMin = bDevMin + jvm;
+    // C: build once on our runner, devices on the farm (1 setup minute per shard).
+    var cDev = ma * 1 + aCap;
+    var cWall = b + 1 + aCap / ma, cMin = b;
+
+    set('o-a-wall', mins(aWall)); set('o-a-min', aMin.toFixed(0)); set('o-a-cost', money(aMin * c * runs));
+    set('o-b-wall', mins(bWall)); set('o-b-min', bMin.toFixed(0)); set('o-b-cost', money(bMin * c * runs));
+    set('o-c-wall', mins(cWall) + ' + queue'); set('o-c-min', cMin.toFixed(0) + ' + ' + cDev.toFixed(0) + ' device');
+    set('o-c-cost', money((cMin * c + cDev * f) * runs));
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.calc-in input'), function (el) {
+    el.addEventListener('input', calc);
+  });
+  calc();
+})();
+</script>
